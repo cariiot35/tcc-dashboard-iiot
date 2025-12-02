@@ -11,6 +11,7 @@
   --accent3: #73B0BA;
   --accent4: #2a4449;
   --danger: #f11c1c;
+  --success: #22c55e;
   --muted: #696B7A;
   --text: #e6edf3;
   --text1: #b8b9b9;
@@ -79,18 +80,17 @@ body {
 
 /* Logo */
 .sidebar-logo { 
-  width: 0; 
-  height: 0; 
   opacity: 0;
+  max-height: 0; /* Esconde a logo no estado colapsado */
   overflow: hidden; 
   transition: all 0.3s ease;
+  width: 100%; /* Garante que a largura seja 100% do container */
+  max-width: 180px; /* Limite máximo de largura */
 }
 
 .sidebar.expanded .sidebar-logo {
   opacity: 1;
-  width: 100%;
-  max-width: 180px;
-  height: auto;
+  max-height: 200px; /* Valor grande o suficiente para a logo aparecer */
   margin-bottom: 8px;
 }
 
@@ -250,7 +250,6 @@ nav.tabs-sidebar {
 
 .mitigation-btn {
   background: var(--bg2);
-  border-color: linear-gradient(135deg, var(--success), #22c55e);
   color: var(--text1);
   border: 1px solid transparent;
   padding: 8px;
@@ -271,6 +270,16 @@ nav.tabs-sidebar {
 .mitigation-btn:hover {
   transform: translateY(-2px);
   background: var(--bg3);
+  border-color: var(--success); /* Adicionado para corrigir o bug anterior */
+}
+
+.mitigation-btn.active {
+  border-color: var(--success); /* Adicionado para corrigir o bug anterior */
+}
+
+.mitigation-btn.active {
+  background: var(--bg3);
+  border-color: var(--success);
 }
 
 .mitigation-btn:disabled {
@@ -362,28 +371,91 @@ nav.tabs-sidebar {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* mantém controle do scroll interno */
+  overflow: hidden;
   padding: 20px;
   background: var(--bg);
 }
 
 main {
   flex: 1;
-  min-height: 0;    /* ESSENCIAL para permitir scroll dos filhos */
+  min-height: 0;
   display: flex;
-  overflow: hidden; /* evita scroll duplo */
+  overflow: hidden;
 }
 
-#page-tendencias {
+/* Visão Geral - Grid Responsivo */
+#page-visao-geral {
   flex: 1;
-  min-height: 0;    /* permite que o overflow funcione */
-  overflow-y: auto; /* habilita scroll vertical */
+  min-height: 0;
+  overflow-y: auto;
   overflow-x: hidden;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(300px, 1.2fr) minmax(280px, 1fr);
+  grid-template-rows: auto auto 1fr;
+  gap: 12px;
+  padding-bottom: 20px;
+  align-content: start;
+}
+
+#page-visao-geral .graphs-column {
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
+#page-visao-geral .kpis-compact {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+#page-visao-geral .topology-card {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+#page-visao-geral .logs-card {
+  grid-column: 1 / 3;
+  grid-row: 3;
+}
+
+/* Tendências - Grid Responsivo */
+#page-tendencias {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding-bottom: 20px;
+  align-content: start;
+  grid-auto-rows: min-content;
+}
+
+#page-tendencias .card {
+  min-height: 0;
+  height: fit-content;
+}
+
+#page-tendencias .card-full {
+  grid-column: 1 / 3;
+}
+
+/* Altura dos gráficos dentro dos cards */
+#page-tendencias .chart-container {
+  height: 280px;
+  margin-top: 8px;
+  position: relative;
+}
+
+#page-tendencias .chart-container canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
 
 /* Colunas */
 .col { 
@@ -392,17 +464,17 @@ main {
   gap: var(--gap);
   flex: 1;
   min-width: 0;
+  min-height: 0;
 }
 
 .col.wide { 
   flex: 2;
-  overflow-y: visible;
- 
 }
 
 .col.narrow { 
   flex: 1; 
-  max-width: 420px; 
+  max-width: 420px;
+  min-width: 280px;
 }
 
 /* Cards */
@@ -412,12 +484,26 @@ main {
   border-radius: var(--radius); 
   border: 1px solid var(--glass); 
   box-shadow: 0 4px 18px rgba(11,17,18,0.10);
-  overflow: hidden;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+}
+
+.card strong {
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+.card .chart-container,
+.card > div[style*="height"] {
+  flex-shrink: 0;
 }
 
 /* ===========================
     KPIs
     =========================== */
+
 .kpis { 
   display: flex; 
   flex-direction: column; 
@@ -483,36 +569,45 @@ main {
 .kpis-compact {
   display: grid;
   gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+  justify-content: start;
+  width: 100%;
 }
 
 .kpi-compact {
-  padding: 10px;
+  padding: 10px 12px;
   border-radius: 8px;
   background: linear-gradient(135deg, var(--glass), transparent);
   border: 1px solid var(--accent2);
   transition: all 0.3s;
+  min-height: clamp(80px, 10vh, 100px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .kpi-compact:hover {
-  transform: translateY(2px);
+  transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(250, 164, 92, 0.2);
 }
 
 .kpi-compact .label {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text1);
   text-transform: uppercase;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   letter-spacing: 0.5px;
+  line-height: 1.2;
 }
 
 .kpi-compact .value {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   display: flex;
   align-items: baseline;
   gap: 4px;
   flex-wrap: wrap;
+  line-height: 1.2;
 }
 
 .kpi-compact .unit {
@@ -608,7 +703,9 @@ th {
     =========================== */
 
 .topologia-container {
-  height: 250px;          /* altura fixa */
+  height: 25vh;
+  max-height: 250px;
+  min-height: 180px;
   margin-top: 12px;
   border-radius: 8px;
   overflow: hidden;
@@ -622,7 +719,7 @@ th {
   border: 1px solid var(--glass);
   border-radius: 8px;
   width: 100%;
-  height: 100%;           /* ocupa todo o espaço do container */
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -633,9 +730,8 @@ th {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;    /* mantém proporção sem estourar */
+  object-fit: contain;
 }
-
 
 /* ===========================
     SCROLLBAR
@@ -658,7 +754,7 @@ th {
 /* ===========================
     MEDIA QUERIES - DESKTOP
     =========================== */
-@media (min-width: 769px) {
+@media (min-width: 1025px) {
   .app { 
     flex-direction: row; 
   }
@@ -666,6 +762,37 @@ th {
   .sidebar { 
     height: 100vh;
     border-right: 1px solid var(--bg2); 
+  }
+}
+
+/* ===========================
+    MEDIA QUERIES - TABLET
+    =========================== */
+@media (max-width: 1024px) and (min-width: 769px) {
+  #page-visao-geral {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+
+  #page-visao-geral .graphs-column,
+  #page-visao-geral .kpis-compact,
+  #page-visao-geral .topology-card,
+  #page-visao-geral .logs-card {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+
+  .kpis-compact {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  #page-tendencias {
+    grid-template-columns: 1fr;
+  }
+
+  #page-tendencias .card-full,
+  #page-tendencias .card {
+    grid-column: 1 !important;
   }
 }
 
@@ -688,29 +815,36 @@ th {
     overflow-x: auto; 
     overflow-y: hidden;
     padding: 8px;
+    gap: 8px;
   }
 
   .sidebar.expanded {
     width: 100%;
     min-width: 100%;
+    max-height: 80px;
   }
 
-  .sidebar-logo {
-    display: none !important;
-  }
+  /* Removido: .sidebar-logo { display: none !important; } para permitir que a logo apareça no mobile se a sidebar for expandida */
 
   .sidebar-toggle {
     max-width: 48px;
+    padding: 8px;
   }
   
   nav.tabs-sidebar { 
     flex-direction: row;
     flex-wrap: nowrap;
+    gap: 6px;
   }
 
   .tab {
     min-width: 48px;
     flex-shrink: 0;
+    padding: 10px;
+  }
+
+  .tab-label {
+    display: none !important;
   }
 
   .attack-section {
@@ -740,10 +874,37 @@ th {
   #page-visao-geral { 
     display: flex !important; 
     flex-direction: column !important;
+    gap: 12px;
+  }
+
+  #page-visao-geral .graphs-column,
+  #page-visao-geral .kpis-compact,
+  #page-visao-geral .topology-card,
+  #page-visao-geral .logs-card {
+    grid-column: auto !important;
+    grid-row: auto !important;
   }
 
   #page-visao-geral .kpis-compact {
     grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px;
+  }
+
+  .kpi-compact {
+    min-height: clamp(60px, 7vh, 75px);
+    padding: 8px 10px;
+  }
+
+  .kpi-compact .label {
+    font-size: 9px;
+  }
+
+  .kpi-compact .value {
+    font-size: 15px;
+  }
+
+  .kpi-compact .unit {
+    font-size: 10px;
   }
 
   #page-visao-geral > div[style*="grid-row"] {
@@ -755,17 +916,38 @@ th {
   }
 
   #page-tendencias { 
-    display: flex !important; 
-    flex-direction: column !important;
     grid-template-columns: 1fr !important;
+    padding-bottom: 16px;
+    gap: 10px;
   }
 
-  #page-tendencias > * {
+  #page-tendencias .card-full,
+  #page-tendencias .card {
     grid-column: 1 !important;
+  }
+
+  #page-tendencias .chart-container {
+    height: 250px;
   }
   
   .stats-grid { 
     grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); 
+    gap: 12px;
+  }
+
+  .topologia-container {
+    height: 18vh;
+    min-height: 100px;
+    max-height: 150px;
+  }
+
+  #page-tendencias .card {
+    min-height: 0;
+    padding: 10px;
+  }
+
+  .card {
+    padding: 10px;
   }
 }
 
@@ -773,12 +955,30 @@ th {
     MEDIA QUERIES - MOBILE SMALL
     =========================== */
 @media (max-width: 480px) {
+  .main-content {
+    padding: 8px;
+  }
+
   .kpi .value { 
     font-size: 20px; 
   }
+
+  .kpi-compact .value {
+    font-size: 14px;
+  }
+
+  .kpi-compact .label {
+    font-size: 8px;
+  }
+
+  #page-visao-geral .kpis-compact {
+    grid-template-columns: 1fr !important;
+    gap: 6px;
+  }
   
   .stats-grid { 
-    grid-template-columns: repeat(2, 1fr); 
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
   
   table { 
@@ -787,5 +987,52 @@ th {
 
   th, td {
     padding: 6px 4px;
+  }
+
+  .sidebar {
+    padding: 6px;
+    gap: 6px;
+  }
+
+  .tab {
+    min-width: 44px;
+    padding: 8px;
+  }
+
+  #page-tendencias {
+    gap: 8px;
+  }
+
+  #page-tendencias .chart-container {
+    height: 220px;
+  }
+
+  .topologia-container {
+    height: 16vh;
+    min-height: 90px;
+    max-height: 130px;
+  }
+}
+
+/* ===========================
+    MEDIA QUERIES - LANDSCAPE MOBILE
+    =========================== */
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
+  .sidebar {
+    max-height: 60px;
+    padding: 6px;
+  }
+
+  .main-content {
+    padding: 10px;
+  }
+
+  .topologia-container {
+    height: 30vh;
+    max-height: 140px;
+  }
+
+  #page-tendencias .chart-container {
+    height: 200px;
   }
 }

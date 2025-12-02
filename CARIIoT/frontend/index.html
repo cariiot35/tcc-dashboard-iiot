@@ -84,8 +84,6 @@
           <option value="60">1 hora</option>
           <option value="1440">24 horas</option>
         </select>
-
-        <button id="refreshBtn" class="primary" title="Recarregar">🔄 Atualizar</button>
       </div>
     </aside>
 
@@ -93,10 +91,10 @@
     <div class="main-content">
       <main>
         <!-- ABA VISÃO GERAL -->
-        <section id="page-visao-geral" class="col wide" aria-label="Visão Geral" style="display:grid; grid-template-columns: 563px 1fr; grid-template-rows: auto 1fr auto; gap: 12px;">
+        <section id="page-visao-geral" class="col wide" aria-label="Visão Geral">
           
           <!-- Gráficos à esquerda empilhados -->
-          <div style="grid-row: 1 / 3; display: flex; flex-direction: column; gap: 12px;">
+          <div class="graphs-column">
             <div class="card">
               <strong>Temperatura ao Longo do Tempo</strong>
               <div style="height:180px; margin-top:8px;">
@@ -113,7 +111,7 @@
           </div>
 
           <!-- KPIs compactos acima da topologia -->
-          <div class="kpis-compact" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+          <div class="kpis-compact">
             <div class="kpi-compact">
               <div class="label">Temperatura</div>
               <div class="value" id="kpiTemperatura">
@@ -168,7 +166,7 @@
           </div>
 
           <!-- Topologia embaixo -->
-          <div class="card">
+          <div class="card topology-card">
             <strong>Topologia do Sistema</strong>
             <div class="topologia-container">
               <div id="simImage"></div>
@@ -176,7 +174,7 @@
           </div>
 
           <!-- Tabela de logs abaixo de tudo -->
-          <div class="card" style="grid-column: 1 / 3;">
+          <div class="card logs-card">
             <strong>Registro de Logs</strong>
             <div style="max-height:280px; overflow:auto; margin-top:8px;">
               <table id="latestTable">
@@ -198,41 +196,41 @@
         </section>
 
         <!-- ABA TENDÊNCIAS -->
-        <section id="page-tendencias" class="col wide" aria-label="Tendências & Análises" style="display:none; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div class="card" style="grid-column: 1 / 3;">
+        <section id="page-tendencias" class="col wide" aria-label="Tendências & Análises" style="display:none;">
+          <div class="card card-full">
             <strong>Análise de Tendências</strong>
             <div class="small">Comparativo de períodos e padrões de comportamento</div>
           </div>
 
           <div class="card">
             <strong>Temperatura - Últimas 24h vs 24-48h</strong>
-            <div style="height:280px; margin-top:8px;">
+            <div class="chart-container">
               <canvas id="tempCompareChart"></canvas>
             </div>
           </div>
 
           <div class="card">
             <strong>Recursos do Sistema - Comparativo</strong>
-            <div style="height:280px; margin-top:8px;">
+            <div class="chart-container">
               <canvas id="resourceCompareChart"></canvas>
             </div>
           </div>
 
           <div class="card">
             <strong>Taxa de Mensagens do Sistema</strong>
-            <div style="height:280px; margin-top:8px;">
+            <div class="chart-container">
               <canvas id="msgRateChart"></canvas>
             </div>
           </div>
 
           <div class="card">
             <strong>Análise de Eventos</strong>
-            <div style="height:280px; margin-top:8px;">
+            <div class="chart-container">
               <canvas id="eventAnalysisChart"></canvas>
             </div>
           </div>
 
-          <div class="card" style="grid-column: 1 / 3;">
+          <div class="card card-full">
             <strong>Estatísticas de Operação</strong>
             <div class="stats-grid">
               <div class="stat-item">

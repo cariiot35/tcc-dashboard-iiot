@@ -37,7 +37,7 @@ const pages = {
 const sidebar = document.getElementById('sidebar');
 const sidebarToggle = document.getElementById('sidebarToggle');
 const timeRange = document.getElementById('timeRange');
-const refreshBtn = document.getElementById('refreshBtn');
+// const refreshBtn = document.getElementById('refreshBtn'); // Removido: Botão Atualizar não é mais necessário
 
 /* ==========================
    SIDEBAR RETRÁTIL
@@ -613,8 +613,11 @@ function renderStats() {
 }
 
 /* ==========================
-   CONTROLE DE ATAQUES
+   CONTROLE DE ATAQUES - VERSÃO NGROK
    ========================== */
+
+// ✅ URL DO SEU NGROK - ATUALIZE COM A SUA!
+const API_BASE_URL = 'https://septariate-woodrow-fixatedly.ngrok-free.dev';
 
 // Estado dos ataques
 const attackState = {
@@ -631,79 +634,267 @@ const mitigateDosBtn = document.getElementById('mitigateDos');
 // Função para executar script no Fedora
 async function executeScript(endpoint, body = null) {
   try {
-    const response = await fetch(`https://septariate-woodrow-fixatedly.ngrok-free.dev${endpoint}`, {
+    console.log(`📡 Enviando requisição para: ${API_BASE_URL}${endpoint}`, body);
+    
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'POST',
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
       body: body ? JSON.stringify(body) : null
     });
 
+    console.log(`📊 Resposta recebida:`, response.status, response.statusText);
+
     if (!response.ok) {
-      throw new Error('Erro ao executar script');
+      const errorText = await response.text();
+      throw new Error(`Erro ${response.status}: ${response.statusText}\n${errorText}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log(`✅ Resposta JSON:`, data);
+    return data;
 
   } catch (err) {
-    console.error('Erro:', err);
+    console.error('❌ Erro na requisição:', err);
     alert("Erro: " + err.message);
+    throw err;
   }
 }
 
 // Handler do botão Flood Attack
 attackFloodBtn.addEventListener('click', async () => {
-  if (attackState.flood) {
-    await executeScript("/parar/ataque_flood");
-    attackState.flood = false;
-    attackFloodBtn.classList.remove('active');
-    console.log("✅ Ataque Flood parado");
-  } else {
-    await executeScript("/executar", { acao: "ataque_flood" });
-    attackState.flood = true;
-    attackFloodBtn.classList.add('active');
-    console.log("⚠️ Ataque Flood iniciado");
+  try {
+    attackFloodBtn.disabled = true;
+    attackFloodBtn.textContent = attackState.flood ? 'Parando...' : 'Iniciando...';
+    
+    if (attackState.flood) {
+      const result = await executeScript("/executar", { acao: "flood", tipo: "stop" });
+      attackState.flood = false;
+      attackFloodBtn.classList.remove('active');
+      attackFloodBtn.textContent = 'Iniciar Flood Attack';
+      console.log("✅ Ataque Flood parado", result);
+      alert("✅ Ataque Flood parado");
+    } else {
+      const result = await executeScript("/executar", { acao: "flood", tipo: "start" });
+      attackState.flood = true;
+      attackFloodBtn.classList.add('active');
+      attackFloodBtn.textContent = 'Parar Flood Attack';
+      console.log("⚠️ Ataque Flood iniciado", result);
+      alert("⚠️ Ataque Flood iniciado");
+    }
+  } catch (error) {
+    console.error("Erro no botão Flood:", error);
+  } finally {
+    attackFloodBtn.disabled = false;
   }
 });
 
 // Handler do botão DoS Attack
 attackDosBtn.addEventListener('click', async () => {
-  if (attackState.dos) {
-    await executeScript("/parar/ataque_dos");
-    attackState.dos = false;
-    attackDosBtn.classList.remove('active');
-    console.log("✅ Ataque DoS parado");
-  } else {
-    await executeScript("/executar", { acao: "ataque_dos" });
-    attackState.dos = true;
-    attackDosBtn.classList.add('active');
-    console.log("⚠️ Ataque DoS iniciado");
+  try {
+    attackDosBtn.disabled = true;
+    attackDosBtn.textContent = attackState.dos ? 'Parando...' : 'Iniciando...';
+    
+    if (attackState.dos) {
+      const result = await executeScript("/executar", { acao: "dos", tipo: "stop" });
+      attackState.dos = false;
+      attackDosBtn.classList.remove('active');
+      attackDosBtn.textContent = 'Iniciar DoS Attack';
+      console.log("✅ Ataque DoS parado", result);
+      alert("✅ Ataque DoS parado");
+    } else {
+      const result = await executeScript("/executar", { acao: "dos", tipo: "start" });
+      attackState.dos = true;
+      attackDosBtn.classList.add('active');
+      attackDosBtn.textContent = 'Parar DoS Attack';
+      console.log("⚠️ Ataque DoS iniciado", result);
+      alert("⚠️ Ataque DoS iniciado");
+    }
+  } catch (error) {
+    console.error("Erro no botão DoS:", error);
+  } finally {
+    attackDosBtn.disabled = false;
   }
 });
 
 // Handler do botão Mitigate Flood
 mitigateFloodBtn.addEventListener("click", async () => {
-  await executeScript("/executar", { acao: "mitigacao_flood" });
+  try {
+    mitigateFloodBtn.disabled = true;
+    mitigateFloodBtn.textContent = 'Ativando...';
+    
+    const result = await executeScript("/executar", { acao: "mitigacao_flood", tipo: "start" });
+    console.log("Mitigação Flood:", result);
 
-  if (attackState.flood) {
-    await executeScript("/parar/ataque_flood");
-    attackState.flood = false;
-    attackFloodBtn.classList.remove("active");
+    if (attackState.flood) {
+      await executeScript("/executar", { acao: "flood", tipo: "stop" });
+      attackState.flood = false;
+      attackFloodBtn.classList.remove("active");
+      attackFloodBtn.textContent = 'Iniciar Flood Attack';
+    }
+
+    alert("🛡️ Mitigação Flood ativada com sucesso!\nO cenário será resetado em 10 segundos.");
+  } catch (error) {
+    console.error("Erro na mitigação Flood:", error);
+    alert("❌ Erro na mitigação Flood: " + error.message);
+  } finally {
+    mitigateFloodBtn.disabled = false;
+    mitigateFloodBtn.textContent = 'Mitigar Flood';
   }
-
-  alert("🛡️ Mitigação Flood ativada com sucesso!");
 });
 
 // Handler do botão Mitigate DoS
 mitigateDosBtn.addEventListener("click", async () => {
-  await executeScript("/executar", { acao: "mitigacao_dos" });
+  try {
+    mitigateDosBtn.disabled = true;
+    mitigateDosBtn.textContent = 'Ativando...';
+    
+    const result = await executeScript("/executar", { acao: "mitigacao_dos", tipo: "start" });
+    console.log("Mitigação DoS:", result);
 
-  if (attackState.dos) {
-    await executeScript("/parar/ataque_dos");
-    attackState.dos = false;
-    attackDosBtn.classList.remove("active");
+    if (attackState.dos) {
+      await executeScript("/executar", { acao: "dos", tipo: "stop" });
+      attackState.dos = false;
+      attackDosBtn.classList.remove("active");
+      attackDosBtn.textContent = 'Iniciar DoS Attack';
+    }
+
+    alert("🛡️ Mitigação DoS ativada com sucesso!\nO cenário será resetado em 10 segundos.");
+  } catch (error) {
+    console.error("Erro na mitigação DoS:", error);
+    alert("❌ Erro na mitigação DoS: " + error.message);
+  } finally {
+    mitigateDosBtn.disabled = false;
+    mitigateDosBtn.textContent = 'Mitigar DoS';
   }
-
-  alert("🛡️ Mitigação DoS ativada com sucesso!");
 });
+
+// Função para testar conexão
+async function testConnection() {
+  try {
+    console.log(`🔗 Testando conexão com: ${API_BASE_URL}/ping`);
+    const response = await fetch(`${API_BASE_URL}/ping`, {
+      method: 'GET',
+      headers: { "Accept": "application/json" }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log("✅ Conexão com backend OK:", data);
+    
+    // Mostra a URL em uso
+    showConnectionStatus(true, data.url || API_BASE_URL);
+    return true;
+    
+  } catch (error) {
+    console.error("❌ Falha na conexão com backend:", error);
+    showConnectionStatus(false, API_BASE_URL);
+    return false;
+  }
+}
+
+// Função para mostrar status da conexão
+function showConnectionStatus(connected, url) {
+  let statusElement = document.getElementById('connection-status');
+  
+  if (!statusElement) {
+    statusElement = document.createElement('div');
+    statusElement.id = 'connection-status';
+    statusElement.style.cssText = `
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      padding: 10px 15px;
+      border-radius: 5px;
+      font-size: 12px;
+      z-index: 1000;
+      font-family: monospace;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    `;
+    document.body.appendChild(statusElement);
+  }
+  
+  if (connected) {
+    statusElement.style.background = '#27ae60';
+    statusElement.style.color = 'white';
+    statusElement.innerHTML = `
+      ✅ Conectado<br>
+      <small>${url.replace('https://', '')}</small>
+    `;
+  } else {
+    statusElement.style.background = '#e74c3c';
+    statusElement.style.color = 'white';
+    statusElement.innerHTML = `
+      ❌ Sem conexão<br>
+      <small>${url}</small>
+    `;
+  }
+}
+
+// Função para verificar status dos processos
+async function checkProcessStatus() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/status`);
+    const data = await response.json();
+    
+    // Atualiza estado dos botões baseado nos processos ativos
+    data.processos.forEach(processo => {
+      if (processo.nome === 'ataque_flood' && processo.ativo) {
+        attackState.flood = true;
+        attackFloodBtn.classList.add('active');
+        attackFloodBtn.textContent = 'Parar Flood Attack';
+      }
+      if (processo.nome === 'ataque_dos' && processo.ativo) {
+        attackState.dos = true;
+        attackDosBtn.classList.add('active');
+        attackDosBtn.textContent = 'Parar DoS Attack';
+      }
+    });
+    
+    console.log("🔄 Status atualizado:", data);
+    
+  } catch (error) {
+    console.error("Erro ao verificar status:", error);
+  }
+}
+
+// Testa a conexão quando a página carrega
+window.addEventListener('load', async () => {
+  console.log(`🌐 Dashboard iniciado`);
+  console.log(`📡 URL da API: ${API_BASE_URL}`);
+  
+  // Mostra URL em uso no console
+  console.log(`ℹ️  Para testar manualmente:`);
+  console.log(`   curl ${API_BASE_URL}/ping`);
+  console.log(`   curl -X POST ${API_BASE_URL}/executar -H "Content-Type: application/json" -d '{"acao":"flood","tipo":"start"}'`);
+  
+  // Testa conexão
+  const connected = await testConnection();
+  
+  if (connected) {
+    console.log("✅ Dashboard pronto para uso!");
+    
+    // Verifica status inicial dos processos
+    await checkProcessStatus();
+    
+    // Atualiza status periodicamente (a cada 30 segundos)
+    setInterval(checkProcessStatus, 30000);
+  } else {
+    console.error("❌ Dashboard não conseguiu conectar ao backend");
+    alert(`❌ Não foi possível conectar ao backend!\n\nURL: ${API_BASE_URL}\n\nCertifique-se que:\n1. O backend está rodando (python3 backendtestefinal.py)\n2. Ngrok está ativo (ngrok http 5001)\n3. A URL está correta: ${API_BASE_URL}`);
+  }
+});
+
+// Teste rápido via console
+window.testBackend = async function() {
+  console.log("🧪 Testando backend...");
+  await testConnection();
+};
 
 /* ==========================
    RENDERIZAÇÃO POR ABA
@@ -816,10 +1007,7 @@ tabs.forEach((tab) => {
    LISTENERS DE EVENTOS
    ========================== */
 
-refreshBtn.addEventListener('click', () => {
-  console.log('🔄 Atualizando...');
-  renderAll();
-});
+// Listener do botão 'Atualizar' removido. O carregamento de dados é feito automaticamente pelo Firebase.
 
 /* ==========================
    INICIALIZAÇÃO
