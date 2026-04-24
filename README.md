@@ -37,7 +37,7 @@ Este dashboard atua em conjunto com o repositório de infraestrutura. Para enten
  - **Interface Responsiva:** Adaptada para visualização em diferentes dispositivos.
 
 ## Autores
-**Desenvolvido por:**
+**Projeto desenvolvido por:**
  - Laís de Sá Santos;
  - Lázaro Levy Fragoso de Souza; 
  - Lucas Silva Matos;
