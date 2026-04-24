@@ -1,0 +1,68 @@
+<div align="center">
+  <img src="https://github.com/cariiot35/tcc-dashboard-iiot/blob/8f55a6b040ba20e2c24a13e980de1e76af37c7d8/CARIIoT/frontend/img/logo.png" alt="CARIIOT" width="600">
+</div>
+
+## Sobre CARIIoT (Dashboard)
+<div align="justify">
+O CARIIoT (Controle e Análise de Redes de Internet Industrial das Coisas) é um projeto de TCC desenvolvido na ETEC de Embu das Artes. Esta frente do projeto foca na <b>interface de monitoramento</b>, responsável por exibir em tempo real os dados coletados no ambiente industrial e alertar sobre possíveis ataques simulados.
+
+
+## Descrição
+Este repositório contém o código-fonte do **Dashboard Web**, a camada visual do projeto. Ele foi desenvolvido para fornecer uma experiência de monitoramento intuitiva, utilizando tecnologias de nuvem para garantir que os dados de segurança da rede IIoT sejam acessíveis de qualquer lugar via navegador.
+
+## Link do Projeto
+> **Acesse a aplicação online:** [https://cariiot.web.app](https://cariiot.web.app)
+
+## Conexão com o Ambiente
+Este dashboard atua em conjunto com o repositório de infraestrutura. Para entender como os dados são gerados e como os ataques são simulados, acesse:
+[**tcc-ambiente-iiot**](https://github.com/cariiot35/tcc-ambiente-iiot)
+
+## Tecnologias e Ferramentas
+ - **Linguagem:** JavaScript (Vanilla), HTML5 e CSS3 (Bootstrap).
+ - **Banco de Dados Realtime:** Firebase Realtime Database (Sincronização instantânea).
+ - **Hospedagem (Hosting):** Firebase Hosting.
+ - **Integração:** API de comunicação com o ambiente de testes IIoT.
+ - **Desenvolvimento:** GitHub Codespaces.
+
+## Estrutura do Repositório
+ - `/frontend`: Arquivos principais da interface (HTML, CSS e JS).
+ - `/img`: Ativos visuais, ícones e logo do projeto.
+ - `firebase.json`: Configurações de deploy e regras do Firebase Hosting.
+ - `README.md`: Este arquivo.
+
+## Funcionalidades
+ - **Monitoramento em Tempo Real:** Visualização de dados sem necessidade de refresh.
+ - **Alertas Críticos:** Identificação visual de ataques de DoS e Flood.
+ - **Status de Dispositivos:** Lista e saúde dos nós conectados na rede.
+ - **Interface Responsiva:** Adaptada para visualização em diferentes dispositivos.
+
+## Autores
+**Desenvolvido por:**
+ - Laís de Sá Santos;
+ - Lázaro Levy Fragoso de Souza; 
+ - Lucas Silva Matos;
+ - Maria Clara Jardim Oliveira;
+ - Marina de Jesus Carneiro;
+ - Nicoly Karoline Matzembacher;
+ - Rafaela Oliveira Correia;
+ - Vitor Marçal Moreira.
+
+**Instituição:** Etec de Embu
+
+**Ano:** 2025
+
+## Agradecimentos
+Agradecimentos especiais a:
+- Orientador(a) do TCC;
+- Equipe do Firebase/Google pelo suporte à hospedagem;
+- Comunidade de desenvolvedores frontend.
+
+## Referências
+- [Firebase Documentation](https://firebase.google.com/docs) - Documentação oficial sobre Hosting e Realtime Database.
+- [Bootstrap Docs](https://getbootstrap.com/docs/) - Referência para a estilização e responsividade da interface.
+- [JavaScript.info](https://javascript.info/) - Guia para lógica de manipulação de DOM e integração com APIs.
+
+**Última atualização:** 2026-04-23
+
+> ⭐ Se este repositório foi útil, considere deixar uma estrela! ⭐
+</div>
